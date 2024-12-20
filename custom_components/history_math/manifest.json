@@ -1,10 +1,15 @@
 {
   "domain": "history_math",
   "name": "History Math",
-  "codeowners": ["@sammiq"],
+  "codeowners": [
+    "@sammiq"
+  ],
   "config_flow": true,
-  "dependencies": ["recorder"],
-  "documentation": "https://github.com/sammiq/history_math",
+  "dependencies": [
+    "recorder"
+  ],
+  "documentation": "https://github.com/sammiq/ha-history_math",
+  "issue_tracker": "https://github.com/sammiq/ha-history_math/issues",
   "integration_type": "helper",
   "iot_class": "local_polling",
   "version": "0.1.0"
