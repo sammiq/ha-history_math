@@ -6,8 +6,7 @@ from collections.abc import Mapping
 from typing import Any, cast
 
 import voluptuous as vol
-
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_TYPE
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
 from homeassistant.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
     SchemaConfigFlowHandler,

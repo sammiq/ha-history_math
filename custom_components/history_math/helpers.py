@@ -6,10 +6,10 @@ import datetime
 import logging
 import math
 
+import homeassistant.util.dt as dt_util
 from homeassistant.core import callback
 from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.template import Template
-import homeassistant.util.dt as dt_util
 
 _LOGGER = logging.getLogger(__name__)
 

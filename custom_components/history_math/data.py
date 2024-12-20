@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import datetime
 import logging
 import math
+from dataclasses import dataclass
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder import get_instance, history
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State
 from homeassistant.helpers.template import Template
-import homeassistant.util.dt as dt_util
 
 from .helpers import async_calculate_period, floored_timestamp
 
@@ -132,8 +132,6 @@ class HistoryMath:
 
         max_value = self._async_compute_max_value(
             now_timestamp,
-            current_period_start_timestamp,
-            current_period_end_timestamp,
         )
         self._state = HistoryMathState(max_value, self._period)
         return self._state
@@ -170,10 +168,8 @@ class HistoryMath:
             no_attributes=True,
         ).get(self.entity_id, [])
 
-    def _async_compute_max_value(
-        self, now_timestamp: float, start_timestamp: float, end_timestamp: float
-    ) -> float:
-        """Compute the seconds matched and changes from the history list and first state."""
+    def _async_compute_max_value(self, now_timestamp: float) -> float | None:
+        """Compute the max value for the period."""
         # state_changes_during_period is called with include_start_time_state=True
         # which is the default and always provides the state at the start
         # of the period
@@ -194,7 +190,7 @@ class HistoryMath:
 
             try:
                 history_value = float(history_state.state)
-                if max_value == None or history_value > max_value:
+                if max_value is None or history_value > max_value:
                     max_value = history_value
             except ValueError:
                 # eat the exception

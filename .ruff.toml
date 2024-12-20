@@ -12,8 +12,20 @@ ignore = [
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
     "D203", # no-blank-line-before-class (incompatible with formatter)
     "D212", # multi-line-summary-first-line (incompatible with formatter)
+    "EM101", # Exception must not use a string literal, assign to variable first
+    "EM102", # Exception must not use an f-string literal, assign to variable first
+    "PLR2004", # Magic value used in comparison, consider replacing {} with a constant variable
+    "S101", # Use of `assert` detected
+    "SIM102", # Use a single `if` statement instead of nested `if` statements
+    "TRY003", # Avoid specifying long messages outside the exception class
+    "TRY400", # Use `logging.exception` instead of `logging.error`
     "COM812", # incompatible with formatter
     "ISC001", # incompatible with formatter
+
+    # Moving imports into type-checking blocks can mess with pytest.patch()
+    "TC001", # Move application import {} into a type-checking block
+    "TC002", # Move third-party import {} into a type-checking block
+    "TC003", # Move standard library import {} into a type-checking block
 ]
 
 [lint.flake8-pytest-style]

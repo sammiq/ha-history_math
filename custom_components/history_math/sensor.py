@@ -2,28 +2,26 @@
 
 from __future__ import annotations
 
-from abc import abstractmethod
 import datetime
+from abc import abstractmethod
 from typing import Any
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
 from homeassistant.components.sensor import (
     PLATFORM_SCHEMA as SENSOR_PLATFORM_SCHEMA,
+)
+from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
-    CONF_TYPE,
     CONF_UNIQUE_ID,
-    PERCENTAGE,
-    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import PlatformNotReady
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.device import async_device_info_to_link_from_entity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.reload import async_setup_reload_service
@@ -43,13 +41,7 @@ from .const import (
 )
 from .coordinator import HistoryMathUpdateCoordinator
 from .data import HistoryMath
-from .helpers import pretty_ratio
 
-UNITS: dict[str, str] = {
-    CONF_TYPE_TIME: UnitOfTime.HOURS,
-    CONF_TYPE_RATIO: PERCENTAGE,
-    CONF_TYPE_COUNT: "",
-}
 ICON = "mdi:chart-line"
 
 
@@ -81,7 +73,7 @@ async def async_setup_platform(
     hass: HomeAssistant,
     config: ConfigType,
     async_add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    _: DiscoveryInfoType | None = None,
 ) -> None:
     """Set up the History Stats sensor."""
     await async_setup_reload_service(hass, DOMAIN, PLATFORMS)
@@ -90,7 +82,6 @@ async def async_setup_platform(
     start: Template | None = config.get(CONF_START)
     end: Template | None = config.get(CONF_END)
     duration: datetime.timedelta | None = config.get(CONF_DURATION)
-    sensor_type: str = config[CONF_TYPE]
     name: str = config[CONF_NAME]
     unique_id: str | None = config.get(CONF_UNIQUE_ID)
 
@@ -100,7 +91,7 @@ async def async_setup_platform(
     if not coordinator.last_update_success:
         raise PlatformNotReady from coordinator.last_exception
     async_add_entities(
-        [HistoryMathSensor(hass, coordinator, sensor_type, name, unique_id, entity_id)]
+        [HistoryMathSensor(hass, coordinator, name, unique_id, entity_id)]
     )
 
 
@@ -110,16 +101,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the History stats sensor entry."""
-
-    sensor_type: str = entry.options[CONF_TYPE]
     coordinator = entry.runtime_data
     entity_id: str = entry.options[CONF_ENTITY_ID]
     async_add_entities(
-        [
-            HistoryMathSensor(
-                hass, coordinator, sensor_type, entry.title, entry.entry_id, entity_id
-            )
-        ]
+        [HistoryMathSensor(hass, coordinator, entry.title, entry.entry_id, entity_id)]
     )
 
 
@@ -164,22 +149,19 @@ class HistoryMathSensor(HistoryMathSensorBase):
         self,
         hass: HomeAssistant,
         coordinator: HistoryMathUpdateCoordinator,
-        sensor_type: str,
         name: str,
         unique_id: str | None,
         source_entity_id: str,
     ) -> None:
         """Initialize the HistoryMath sensor."""
         super().__init__(coordinator, name)
-        self._attr_native_unit_of_measurement = UNITS[sensor_type]
-        self._type = sensor_type
+        self._attr_native_unit_of_measurement = ""
         self._attr_unique_id = unique_id
         self._attr_device_info = async_device_info_to_link_from_entity(
             hass,
             source_entity_id,
         )
         self._process_update()
-
 
     @callback
     def _process_update(self) -> None:
