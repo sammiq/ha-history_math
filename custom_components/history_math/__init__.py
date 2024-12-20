@@ -19,9 +19,7 @@ from .data import HistoryMath
 type HistoryMathConfigEntry = ConfigEntry[HistoryMathUpdateCoordinator]
 
 
-async def async_setup_entry(
-    hass: HomeAssistant, entry: HistoryMathConfigEntry
-) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) -> bool:
     """Set up History stats from a config entry."""
     entity_id: str = entry.options[CONF_ENTITY_ID]
     start: str | None = entry.options.get(CONF_START)
