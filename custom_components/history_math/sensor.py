@@ -167,4 +167,4 @@ class HistoryMathSensor(HistoryMathSensorBase):
     def _process_update(self) -> None:
         """Process an update from the coordinator."""
         state = self.coordinator.data
-        self._attr_native_value = state.max_count
+        self._attr_native_value = state.max_value

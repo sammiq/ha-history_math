@@ -2,7 +2,7 @@
   "title": "History Math",
   "config": {
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_account%]"
+      "already_configured": "Account is already configured"
     },
     "error": {
       "only_two_keys_allowed": "The sensor configuration must provide two out of 'start', 'end', 'duration'"
@@ -11,7 +11,7 @@
       "user": {
         "description": "Create a history math sensor",
         "data": {
-          "name": "[%key:common::config_flow::data::name%]",
+          "name": "Name",
           "entity_id": "Entity"
         },
         "data_description": {
@@ -36,30 +36,30 @@
   },
   "options": {
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_account%]"
+      "already_configured": "Account is already configured"
     },
     "error": {
-      "only_two_keys_allowed": "[%key:component::history_math::config::error::only_two_keys_allowed%]"
+      "only_two_keys_allowed": "The sensor configuration must provide two out of 'start', 'end', 'duration'"
     },
     "step": {
       "init": {
-        "description": "[%key:component::history_math::config::step::options::description%]",
+        "description": "Create a history math sensor",
         "data": {
-          "start": "[%key:component::history_math::config::step::options::data::start%]",
-          "end": "[%key:component::history_math::config::step::options::data::end%]",
-          "duration": "[%key:component::history_math::config::step::options::data::duration%]"
+          "start": "Start",
+          "end": "End",
+          "duration": "Duration"
         },
         "data_description": {
-          "start": "[%key:component::history_math::config::step::options::data_description::start%]",
-          "end": "[%key:component::history_math::config::step::options::data_description::end%]",
-          "duration": "[%key:component::history_math::config::step::options::data_description::duration%]"
+          "start": "When to start the measure (timestamp or datetime). Can be a template.",
+          "end": "When to stop the measure (timestamp or datetime). Can be a template",
+          "duration": "Duration of the measure."
         }
       }
     }
   },
   "services": {
     "reload": {
-      "name": "[%key:common::action::reload%]",
+      "name": "Reload",
       "description": "Reloads history stats sensors from the YAML-configuration."
     }
   }
