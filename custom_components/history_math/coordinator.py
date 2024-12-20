@@ -34,7 +34,6 @@ class HistoryMathUpdateCoordinator(DataUpdateCoordinator[HistoryMathState]):
         self,
         hass: HomeAssistant,
         history_math: HistoryMath,
-        config_entry: ConfigEntry | None,
         name: str,
     ) -> None:
         """Initialize DataUpdateCoordinator."""
@@ -45,7 +44,6 @@ class HistoryMathUpdateCoordinator(DataUpdateCoordinator[HistoryMathState]):
         super().__init__(
             hass,
             _LOGGER,
-            config_entry=config_entry,
             name=name,
             update_interval=UPDATE_INTERVAL,
         )

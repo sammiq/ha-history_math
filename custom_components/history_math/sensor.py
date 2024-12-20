@@ -87,7 +87,7 @@ async def async_setup_platform(
     unique_id: str | None = config.get(CONF_UNIQUE_ID)
 
     history_math = HistoryMath(hass, entity_id, start, end, duration)
-    coordinator = HistoryMathUpdateCoordinator(hass, history_math, None, name)
+    coordinator = HistoryMathUpdateCoordinator(hass, history_math, name)
     await coordinator.async_refresh()
     if not coordinator.last_update_success:
         raise PlatformNotReady from coordinator.last_exception

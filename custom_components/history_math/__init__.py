@@ -36,7 +36,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) 
         Template(end, hass) if end else None,
         duration,
     )
-    coordinator = HistoryMathUpdateCoordinator(hass, history_math, entry, entry.title)
+    coordinator = HistoryMathUpdateCoordinator(hass, history_math, entry.title)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
 
