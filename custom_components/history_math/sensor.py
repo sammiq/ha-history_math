@@ -23,6 +23,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers.device import async_device_info_to_link_from_entity
+from homeassistant.helpers.entity import get_unit_of_measurement
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.reload import async_setup_reload_service
 from homeassistant.helpers.template import Template
@@ -155,7 +156,10 @@ class HistoryMathSensor(HistoryMathSensorBase):
     ) -> None:
         """Initialize the HistoryMath sensor."""
         super().__init__(coordinator, name)
-        self._attr_native_unit_of_measurement = ""
+        self._attr_native_unit_of_measurement = get_unit_of_measurement(
+            hass,
+            source_entity_id,
+        )
         self._attr_unique_id = unique_id
         self._attr_device_info = async_device_info_to_link_from_entity(
             hass,

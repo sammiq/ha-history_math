@@ -68,6 +68,13 @@ class HistoryMath:
         # Get the current period
         current_period_start, current_period_end = self._period
 
+        _LOGGER.debug(
+            "Time Period %s to %s (duration %s)",
+            current_period_start,
+            current_period_end,
+            self._duration,
+        )
+
         # Convert times to UTC
         current_period_start = dt_util.as_utc(current_period_start)
         current_period_end = dt_util.as_utc(current_period_end)
@@ -131,7 +138,7 @@ class HistoryMath:
             self._previous_run_before_start = False
 
         max_value = self._async_compute_max_value(
-            now_timestamp,
+            now_timestamp, current_period_start_timestamp, current_period_end_timestamp
         )
         self._state = HistoryMathState(max_value, self._period)
         return self._state
@@ -168,16 +175,40 @@ class HistoryMath:
             no_attributes=True,
         ).get(self.entity_id, [])
 
-    def _async_compute_max_value(self, now_timestamp: float) -> float | None:
+    def _async_compute_max_value(
+        self,
+        now_timestamp: float,
+        current_period_start_timestamp: float,
+        current_period_end_timestamp: float,
+    ) -> float | None:
         """Compute the max value for the period."""
         # state_changes_during_period is called with include_start_time_state=True
         # which is the default and always provides the state at the start
         # of the period
+        max_state = None
         max_value = None
 
         # Make calculations
         for history_state in self._history_current_period:
             state_change_timestamp = history_state.last_changed
+
+            if math.floor(state_change_timestamp) < current_period_start_timestamp:
+                # Shouldn't count states that are before we start checking
+                _LOGGER.debug(
+                    "Skipping earlier timestamp %s (now %s)",
+                    state_change_timestamp,
+                    current_period_start_timestamp,
+                )
+                continue
+
+            if math.floor(state_change_timestamp) > current_period_end_timestamp:
+                # Shouldn't count states that are after we finish checking
+                _LOGGER.debug(
+                    "Skipping later timestamp %s (now %s)",
+                    state_change_timestamp,
+                    current_period_end_timestamp,
+                )
+                continue
 
             if math.floor(state_change_timestamp) > now_timestamp:
                 # Shouldn't count states that are in the future
@@ -191,9 +222,19 @@ class HistoryMath:
             try:
                 history_value = float(history_state.state)
                 if max_value is None or history_value > max_value:
+                    max_state = history_state
                     max_value = history_value
             except ValueError:
                 # eat the exception
                 pass
+
+        if max_state is not None:
+            _LOGGER.debug(
+                "state at %s is %s",
+                datetime.datetime.fromtimestamp(
+                    max_state.last_changed, tz=datetime.UTC
+                ),
+                max_state.state,
+            )
 
         return max_value
