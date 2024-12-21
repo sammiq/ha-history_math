@@ -7,11 +7,17 @@
 ![Project Maintenance][maintenance-shield]
 [![Community Forum][forum-shield]][forum]
 
-_Integration to integrate with [ha-history_math][ha-history_math]._
+_Integration to perform mathematical operations on a time period._
 
-**This integration will set up the following platforms.**
+History Math takes an entity and performs operations on a given time period.
 
-TODO
+Some examples:
+  - Measure the Mean temperature over the middle of the day,
+  - Measure the Maximum humidity yesterday,
+  - Measure the Minimum dew point overnight.
+
+  While you can track these manually with a template, this integration can use data from the [history][history] integration,
+  and operates in a similar manner to the [History Stats][history_stats] integration.
 
 ## Installation
 
@@ -32,8 +38,8 @@ TODO
 If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
 
 ***
-
-[ha-history_math]: https://github.com/sammiq/ha-history_math
+[history]: https://www.home-assistant.io/integrations/history
+[history_stats]: https://www.home-assistant.io/integrations/history_stats
 [commits-shield]: https://img.shields.io/github/commit-activity/y/sammiq/ha-history_math.svg?style=for-the-badge
 [commits]: https://github.com/sammiq/ha-history_math/commits/main
 [exampleimg]: example.png

@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from typing import Any, cast
 
 import voluptuous as vol
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME
+from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_TYPE
 from homeassistant.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
     SchemaConfigFlowHandler,
@@ -17,6 +17,9 @@ from homeassistant.helpers.selector import (
     DurationSelector,
     DurationSelectorConfig,
     EntitySelector,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
     TemplateSelector,
     TextSelector,
 )
@@ -26,6 +29,8 @@ from .const import (
     CONF_END,
     CONF_PERIOD_KEYS,
     CONF_START,
+    CONF_TYPE_KEYS,
+    CONF_TYPE_MAX,
     DEFAULT_NAME,
     DOMAIN,
 )
@@ -47,6 +52,13 @@ DATA_SCHEMA_SETUP = vol.Schema(
     {
         vol.Required(CONF_NAME, default=DEFAULT_NAME): TextSelector(),
         vol.Required(CONF_ENTITY_ID): EntitySelector(),
+        vol.Required(CONF_TYPE, default=CONF_TYPE_MAX): SelectSelector(
+            SelectSelectorConfig(
+                options=CONF_TYPE_KEYS,
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key=CONF_TYPE,
+            )
+        ),
     }
 )
 DATA_SCHEMA_OPTIONS = vol.Schema(

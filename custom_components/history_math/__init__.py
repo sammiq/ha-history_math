@@ -5,14 +5,14 @@ from __future__ import annotations
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_TYPE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device import (
     async_remove_stale_devices_links_keep_entity_device,
 )
 from homeassistant.helpers.template import Template
 
-from .const import CONF_DURATION, CONF_END, CONF_START, PLATFORMS
+from .const import CONF_DURATION, CONF_END, CONF_START, CONF_TYPE_MAX, PLATFORMS
 from .coordinator import HistoryMathUpdateCoordinator
 from .data import HistoryMath
 
@@ -24,6 +24,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) 
     entity_id: str = entry.options[CONF_ENTITY_ID]
     start: str | None = entry.options.get(CONF_START)
     end: str | None = entry.options.get(CONF_END)
+    sensor_type: str = entry.options.get(CONF_TYPE, CONF_TYPE_MAX)
 
     duration: timedelta | None = None
     if duration_dict := entry.options.get(CONF_DURATION):
@@ -35,6 +36,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) 
         Template(start, hass) if start else None,
         Template(end, hass) if end else None,
         duration,
+        sensor_type,
     )
     coordinator = HistoryMathUpdateCoordinator(hass, history_math, entry.title)
     await coordinator.async_config_entry_first_refresh()

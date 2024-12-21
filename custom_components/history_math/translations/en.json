@@ -24,12 +24,14 @@
         "data": {
           "start": "Start",
           "end": "End",
-          "duration": "Duration"
+          "duration": "Duration",
+          "type": "Type"
         },
         "data_description": {
           "start": "When to start the measure (timestamp or datetime). Can be a template.",
           "end": "When to stop the measure (timestamp or datetime). Can be a template",
-          "duration": "Duration of the measure."
+          "duration": "Duration of the measure.",
+          "type": "The type of sensor, one of 'max', 'mean' or 'min'"
         }
       }
     }
@@ -54,6 +56,15 @@
           "end": "When to stop the measure (timestamp or datetime). Can be a template",
           "duration": "Duration of the measure."
         }
+      }
+    }
+  },
+  "selector": {
+    "type": {
+      "options": {
+        "max": "Maximum",
+        "mean": "Mean",
+        "min": "Minimum"
       }
     }
   },

@@ -18,6 +18,7 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_NAME,
+    CONF_TYPE,
     CONF_UNIQUE_ID,
 )
 from homeassistant.core import HomeAssistant, callback
@@ -36,6 +37,8 @@ from .const import (
     CONF_END,
     CONF_PERIOD_KEYS,
     CONF_START,
+    CONF_TYPE_KEYS,
+    CONF_TYPE_MAX,
     DEFAULT_NAME,
     DOMAIN,
     PLATFORMS,
@@ -62,6 +65,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_START): cv.template,
             vol.Optional(CONF_END): cv.template,
             vol.Optional(CONF_DURATION): cv.time_period,
+            vol.Optional(CONF_TYPE, default=CONF_TYPE_MAX): vol.In(CONF_TYPE_KEYS),
             vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
             vol.Optional(CONF_UNIQUE_ID): cv.string,
         }
@@ -85,8 +89,9 @@ async def async_setup_platform(
     duration: datetime.timedelta | None = config.get(CONF_DURATION)
     name: str = config[CONF_NAME]
     unique_id: str | None = config.get(CONF_UNIQUE_ID)
+    sensor_type: str = config[CONF_TYPE]
 
-    history_math = HistoryMath(hass, entity_id, start, end, duration)
+    history_math = HistoryMath(hass, entity_id, start, end, duration, sensor_type)
     coordinator = HistoryMathUpdateCoordinator(hass, history_math, name)
     await coordinator.async_refresh()
     if not coordinator.last_update_success:
@@ -171,4 +176,4 @@ class HistoryMathSensor(HistoryMathSensorBase):
     def _process_update(self) -> None:
         """Process an update from the coordinator."""
         state = self.coordinator.data
-        self._attr_native_value = state.max_value
+        self._attr_native_value = state.calc_value

@@ -12,6 +12,12 @@ from homeassistant.components.recorder import get_instance, history
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State
 from homeassistant.helpers.template import Template
 
+from custom_components.history_math.const import (
+    CONF_TYPE_MAX,
+    CONF_TYPE_MEAN,
+    CONF_TYPE_MIN,
+)
+
 from .helpers import async_calculate_period, floored_timestamp
 
 MIN_TIME_UTC = datetime.datetime.min.replace(tzinfo=dt_util.UTC)
@@ -23,7 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 class HistoryMathState:
     """The current stats of the history stats."""
 
-    max_value: float | None
+    calc_value: float | None
     period: tuple[datetime.datetime, datetime.datetime]
 
 
@@ -45,6 +51,7 @@ class HistoryMath:
         start: Template | None,
         end: Template | None,
         duration: datetime.timedelta | None,
+        sensor_type: str,
     ) -> None:
         """Init the history stats manager."""
         self.hass = hass
@@ -56,6 +63,7 @@ class HistoryMath:
         self._duration = duration
         self._start = start
         self._end = end
+        self._sensor_type = sensor_type
 
     async def async_update(
         self, event: Event[EventStateChangedData] | None
@@ -137,10 +145,10 @@ class HistoryMath:
             )
             self._previous_run_before_start = False
 
-        max_value = self._async_compute_max_value(
+        calc_value = self._async_compute_value(
             now_timestamp, current_period_start_timestamp, current_period_end_timestamp
         )
-        self._state = HistoryMathState(max_value, self._period)
+        self._state = HistoryMathState(calc_value, self._period)
         return self._state
 
     async def _async_history_from_db(
@@ -175,24 +183,26 @@ class HistoryMath:
             no_attributes=True,
         ).get(self.entity_id, [])
 
-    def _async_compute_max_value(
+    def _async_compute_value(
         self,
         now_timestamp: float,
         current_period_start_timestamp: float,
         current_period_end_timestamp: float,
     ) -> float | None:
-        """Compute the max value for the period."""
+        """Compute the value for the period."""
         # state_changes_during_period is called with include_start_time_state=True
         # which is the default and always provides the state at the start
         # of the period
-        max_state = None
-        max_value = None
+        calc_value = None
+        calc_items = 0
 
-        # Make calculations
+        # Make calculations - this is done manually because it gets very clunky to use
+        # filter when passing extra arguments.
         for history_state in self._history_current_period:
             state_change_timestamp = history_state.last_changed
+            floored_timestamp = math.floor(state_change_timestamp)
 
-            if math.floor(state_change_timestamp) < current_period_start_timestamp:
+            if floored_timestamp < current_period_start_timestamp:
                 # Shouldn't count states that are before we start checking
                 _LOGGER.debug(
                     "Skipping earlier timestamp %s (now %s)",
@@ -201,7 +211,7 @@ class HistoryMath:
                 )
                 continue
 
-            if math.floor(state_change_timestamp) > current_period_end_timestamp:
+            if floored_timestamp > current_period_end_timestamp:
                 # Shouldn't count states that are after we finish checking
                 _LOGGER.debug(
                     "Skipping later timestamp %s (now %s)",
@@ -210,7 +220,7 @@ class HistoryMath:
                 )
                 continue
 
-            if math.floor(state_change_timestamp) > now_timestamp:
+            if floored_timestamp > now_timestamp:
                 # Shouldn't count states that are in the future
                 _LOGGER.debug(
                     "Skipping future timestamp %s (now %s)",
@@ -221,20 +231,25 @@ class HistoryMath:
 
             try:
                 history_value = float(history_state.state)
-                if max_value is None or history_value > max_value:
-                    max_state = history_state
-                    max_value = history_value
+                if calc_value is None:
+                    calc_value = history_value
+                elif self._sensor_type == CONF_TYPE_MAX:
+                    calc_value = max(history_value, calc_value)
+                elif self._sensor_type == CONF_TYPE_MIN:
+                    calc_value = min(history_value, calc_value)
+                elif self._sensor_type == CONF_TYPE_MEAN:
+                    calc_value = calc_value + history_value
+
+                calc_items = calc_items + 1
             except ValueError:
-                # eat the exception
+                # eat the exception and skip the item
                 pass
 
-        if max_state is not None:
-            _LOGGER.debug(
-                "state at %s is %s",
-                datetime.datetime.fromtimestamp(
-                    max_state.last_changed, tz=datetime.UTC
-                ),
-                max_state.state,
-            )
+        if (
+            self._sensor_type == CONF_TYPE_MEAN
+            and calc_value is not None
+            and calc_items > 0
+        ):
+            calc_value = calc_value / calc_items
 
-        return max_value
+        return calc_value
