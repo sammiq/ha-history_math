@@ -6,6 +6,7 @@ import datetime
 import logging
 import math
 from dataclasses import dataclass
+from statistics import fmean, median
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.recorder import get_instance, history
@@ -13,9 +14,12 @@ from homeassistant.core import Event, EventStateChangedData, HomeAssistant, Stat
 from homeassistant.helpers.template import Template
 
 from custom_components.history_math.const import (
+    CONF_TYPE_LAST,
     CONF_TYPE_MAX,
     CONF_TYPE_MEAN,
+    CONF_TYPE_MEDIAN,
     CONF_TYPE_MIN,
+    CONF_TYPE_RANGE,
 )
 
 from .helpers import async_calculate_period, floored_timestamp
@@ -193,11 +197,10 @@ class HistoryMath:
         # state_changes_during_period is called with include_start_time_state=True
         # which is the default and always provides the state at the start
         # of the period
-        calc_value = None
-        calc_items = 0
+        values: list[float] = []
 
-        # Make calculations - this is done manually because it gets very clunky to use
-        # filter when passing extra arguments.
+        # Collect values for calculations - this is done manually because it gets very
+        #  clunky to use filter when passing extra arguments.
         for history_state in self._history_current_period:
             state_change_timestamp = history_state.last_changed
             floored_timestamp = math.floor(state_change_timestamp)
@@ -231,25 +234,27 @@ class HistoryMath:
 
             try:
                 history_value = float(history_state.state)
-                if calc_value is None:
-                    calc_value = history_value
-                elif self._sensor_type == CONF_TYPE_MAX:
-                    calc_value = max(history_value, calc_value)
-                elif self._sensor_type == CONF_TYPE_MIN:
-                    calc_value = min(history_value, calc_value)
-                elif self._sensor_type == CONF_TYPE_MEAN:
-                    calc_value = calc_value + history_value
-
-                calc_items = calc_items + 1
+                values.append(history_value)
             except ValueError:
                 # eat the exception and skip the item
                 pass
 
-        if (
-            self._sensor_type == CONF_TYPE_MEAN
-            and calc_value is not None
-            and calc_items > 0
-        ):
-            calc_value = calc_value / calc_items
+        if not values:
+            return None
+
+        calc_value = None
+
+        if self._sensor_type == CONF_TYPE_LAST:
+            calc_value = values[-1]
+        elif self._sensor_type == CONF_TYPE_MAX:
+            calc_value = max(values)
+        elif self._sensor_type == CONF_TYPE_MIN:
+            calc_value = min(values)
+        elif self._sensor_type == CONF_TYPE_MEAN:
+            calc_value = fmean(values)
+        elif self._sensor_type == CONF_TYPE_MEDIAN:
+            calc_value = median(values)
+        elif self._sensor_type == CONF_TYPE_RANGE:
+            calc_value = max(values) - min(values)
 
         return calc_value

@@ -9,12 +9,28 @@
 
 _Integration to perform mathematical operations on a time period._
 
-History Math takes an entity and performs operations on a given time period.
+History Math creates a Home Assistant Helper that takes an entity and performs operations on a given time period. This integration
+was designed to replace many template sensors that were set up to track things over time, but were not persistent over restarts.
 
-Some examples:
+Supported operations on the data are:
+  - Last Value
+  - Maximum Value
+  - Mean of Values
+  - Median of Values
+  - Minimum Value
+  - Range of Values (Maximum - Minimum)
+
+The period supported can be a start time, end time and duration, and any two of these to create a time range.
+The start time and end time can both be dynamically evaluated via template syntax and because this integration uses the
+[history][history] integration data, the timeframes do not need to be current, provided the data is still stored in history.
+
+Some examples of usage:
+  - Last measurement of a sensor yesterday,
   - Measure the Mean temperature over the middle of the day,
+  - Measure the Median soil moisture content of your plants,
   - Measure the Maximum humidity yesterday,
-  - Measure the Minimum dew point overnight.
+  - Measure the Minimum dew point overnight,
+  - Measure the amount of power used yesterday on a non resetting counter.
 
   While you can track these manually with a template, this integration can use data from the [history][history] integration,
   and operates in a similar manner to the [History Stats][history_stats] integration.

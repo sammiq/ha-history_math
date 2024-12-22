@@ -62,9 +62,12 @@
   "selector": {
     "type": {
       "options": {
+        "last": "Last",
         "max": "Maximum",
         "mean": "Mean",
-        "min": "Minimum"
+        "median": "Median",
+        "min": "Minimum",
+        "range": "Range"
       }
     }
   },
