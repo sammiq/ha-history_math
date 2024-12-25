@@ -149,9 +149,7 @@ class HistoryMath:
             )
             self._previous_run_before_start = False
 
-        calc_value = self._async_compute_value(
-            now_timestamp, current_period_start_timestamp, current_period_end_timestamp
-        )
+        calc_value = self._async_compute_value(now_timestamp)
         self._state = HistoryMathState(calc_value, self._period)
         return self._state
 
@@ -190,8 +188,6 @@ class HistoryMath:
     def _async_compute_value(
         self,
         now_timestamp: float,
-        current_period_start_timestamp: float,
-        current_period_end_timestamp: float,
     ) -> float | None:
         """Compute the value for the period."""
         # state_changes_during_period is called with include_start_time_state=True
@@ -202,42 +198,13 @@ class HistoryMath:
         # Collect values for calculations - this is done manually because it gets very
         #  clunky to use filter when passing extra arguments.
         for history_state in self._history_current_period:
-            state_change_timestamp = history_state.last_changed
-            floored_timestamp = math.floor(state_change_timestamp)
-
-            if floored_timestamp < current_period_start_timestamp:
-                # Shouldn't count states that are before we start checking
-                _LOGGER.debug(
-                    "Skipping earlier timestamp %s (now %s)",
-                    state_change_timestamp,
-                    current_period_start_timestamp,
-                )
-                continue
-
-            if floored_timestamp > current_period_end_timestamp:
-                # Shouldn't count states that are after we finish checking
-                _LOGGER.debug(
-                    "Skipping later timestamp %s (now %s)",
-                    state_change_timestamp,
-                    current_period_end_timestamp,
-                )
-                continue
-
-            if floored_timestamp > now_timestamp:
-                # Shouldn't count states that are in the future
-                _LOGGER.debug(
-                    "Skipping future timestamp %s (now %s)",
-                    state_change_timestamp,
-                    now_timestamp,
-                )
-                continue
-
-            try:
-                history_value = float(history_state.state)
-                values.append(history_value)
-            except ValueError:
-                # eat the exception and skip the item
-                pass
+            # Shouldn't count states that are in the future
+            if math.floor(history_state.last_changed) <= now_timestamp:
+                try:
+                    values.append(float(history_state.state))
+                except ValueError:
+                    # eat the exception and skip the item
+                    pass
 
         if not values:
             return None

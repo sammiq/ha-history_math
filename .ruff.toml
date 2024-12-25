@@ -18,6 +18,7 @@ ignore = [
     "PLR2004", # Magic value used in comparison, consider replacing {} with a constant variable
     "S101", # Use of `assert` detected
     "SIM102", # Use a single `if` statement instead of nested `if` statements
+    "SIM105", # Use `contextlib.surpress` instead of `try` - `except` - `pass`
     "TRY003", # Avoid specifying long messages outside the exception class
     "TRY400", # Use `logging.exception` instead of `logging.error`
     "COM812", # incompatible with formatter
