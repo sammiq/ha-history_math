@@ -25,17 +25,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) 
     start: str | None = entry.options.get(CONF_START)
     end: str | None = entry.options.get(CONF_END)
     sensor_type: str = entry.options.get(CONF_TYPE, CONF_TYPE_MAX)
-
-    duration: timedelta | None = None
-    if duration_dict := entry.options.get(CONF_DURATION):
-        duration = timedelta(**duration_dict)
+    duration: dict | None = entry.options.get(CONF_DURATION)
 
     history_math = HistoryMath(
         hass,
         entity_id,
         Template(start, hass) if start else None,
         Template(end, hass) if end else None,
-        duration,
+        timedelta(**duration) if duration else None,
         sensor_type,
     )
     coordinator = HistoryMathUpdateCoordinator(hass, history_math, entry.title)
