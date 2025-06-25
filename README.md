@@ -24,6 +24,8 @@ The period supported can be a start time, end time and duration, and any two of 
 The start time and end time can both be dynamically evaluated via template syntax and because this integration uses the
 [history][history] integration data, the timeframes do not need to be current, provided the data is still stored in history.
 
+NOTE: As of Home Assistant 2025.6, [`recorder.get_statistics`](https://www.home-assistant.io/integrations/recorder/#action-get_statistics) exists that may be a better fit for cases where you are not requiring real-time updates of the value, and are reporting values in the past.
+
 Some examples of usage:
   - Last measurement of a sensor yesterday,
   - Measure the Mean temperature over the middle of the day,
