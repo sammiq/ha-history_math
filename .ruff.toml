@@ -28,6 +28,10 @@ ignore = [
     "TC001", # Move application import {} into a type-checking block
     "TC002", # Move third-party import {} into a type-checking block
     "TC003", # Move standard library import {} into a type-checking block
+
+    # Ruff additions that changed from old versions
+    "TC006", # Add quotes to type expression in `typing.cast()`
+    "UP049", # Generic function uses private type parameters
 ]
 
 [lint.flake8-pytest-style]
