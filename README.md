@@ -18,7 +18,7 @@ Supported operations on the data are:
   - Mean of Values
   - Median of Values
   - Minimum Value
-  - Range of Values (Maximum - Minimum)
+  - Change (Maximum - Minimum)
 
 The period supported can be a start time, end time and duration, and any two of these to create a time range.
 The start time and end time can both be dynamically evaluated via template syntax and because this integration uses the

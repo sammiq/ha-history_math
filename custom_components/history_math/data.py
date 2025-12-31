@@ -20,6 +20,7 @@ from custom_components.history_math.const import (
     CONF_TYPE_MEDIAN,
     CONF_TYPE_MIN,
     CONF_TYPE_RANGE,
+    CONF_TYPE_CHANGE,
 )
 
 from .helpers import async_calculate_period, floored_timestamp
@@ -221,7 +222,10 @@ class HistoryMath:
             calc_value = fmean(values)
         elif self._sensor_type == CONF_TYPE_MEDIAN:
             calc_value = median(values)
-        elif self._sensor_type == CONF_TYPE_RANGE:
+        elif (
+            self._sensor_type == CONF_TYPE_RANGE
+            or self._sensor_type == CONF_TYPE_CHANGE
+        ):
             calc_value = max(values) - min(values)
 
         return calc_value

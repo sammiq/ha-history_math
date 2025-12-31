@@ -16,6 +16,7 @@ CONF_TYPE_MEAN = "mean"
 CONF_TYPE_MEDIAN = "median"
 CONF_TYPE_MIN = "min"
 CONF_TYPE_RANGE = "range"
+CONF_TYPE_CHANGE = "change"
 CONF_TYPE_KEYS = [
     CONF_TYPE_LAST,
     CONF_TYPE_MAX,
@@ -23,6 +24,7 @@ CONF_TYPE_KEYS = [
     CONF_TYPE_MEDIAN,
     CONF_TYPE_MIN,
     CONF_TYPE_RANGE,
+    CONF_TYPE_CHANGE,
 ]
 
 DEFAULT_NAME = "unnamed calculation"

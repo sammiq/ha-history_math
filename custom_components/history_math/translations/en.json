@@ -31,7 +31,7 @@
           "start": "When to start the measure (timestamp or datetime). Can be a template.",
           "end": "When to stop the measure (timestamp or datetime). Can be a template",
           "duration": "Duration of the measure.",
-          "type": "The type of sensor, one of 'max', 'mean' or 'min'"
+          "type": "The type of sensor, one of 'max', 'mean', 'median','min' or 'change'"
         }
       }
     }
@@ -67,7 +67,8 @@
         "mean": "Mean",
         "median": "Median",
         "min": "Minimum",
-        "range": "Range"
+        "range": "Range (use Change)",
+        "change": "Change"
       }
     }
   },
