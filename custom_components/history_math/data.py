@@ -14,13 +14,13 @@ from homeassistant.core import Event, EventStateChangedData, HomeAssistant, Stat
 from homeassistant.helpers.template import Template
 
 from custom_components.history_math.const import (
+    CONF_TYPE_CHANGE,
     CONF_TYPE_LAST,
     CONF_TYPE_MAX,
     CONF_TYPE_MEAN,
     CONF_TYPE_MEDIAN,
     CONF_TYPE_MIN,
     CONF_TYPE_RANGE,
-    CONF_TYPE_CHANGE,
 )
 
 from .helpers import async_calculate_period, floored_timestamp
@@ -222,10 +222,7 @@ class HistoryMath:
             calc_value = fmean(values)
         elif self._sensor_type == CONF_TYPE_MEDIAN:
             calc_value = median(values)
-        elif (
-            self._sensor_type == CONF_TYPE_RANGE
-            or self._sensor_type == CONF_TYPE_CHANGE
-        ):
+        elif self._sensor_type in {CONF_TYPE_RANGE, CONF_TYPE_CHANGE}:
             calc_value = max(values) - min(values)
 
         return calc_value
