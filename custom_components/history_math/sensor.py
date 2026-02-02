@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_TYPE,
     CONF_UNIQUE_ID,
+    CONF_UNIT_OF_MEASUREMENT,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import PlatformNotReady
@@ -68,6 +69,7 @@ PLATFORM_SCHEMA = vol.All(
             vol.Optional(CONF_TYPE, default=CONF_TYPE_MAX): vol.In(CONF_TYPE_KEYS),
             vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
             vol.Optional(CONF_UNIQUE_ID): cv.string,
+            vol.Optional(CONF_UNIT_OF_MEASUREMENT): cv.string,
         }
     ),
     exactly_two_period_keys,
@@ -90,6 +92,7 @@ async def async_setup_platform(
     name: str = config[CONF_NAME]
     unique_id: str | None = config.get(CONF_UNIQUE_ID)
     sensor_type: str = config[CONF_TYPE]
+    unit_of_measurement: str | None = config.get(CONF_UNIT_OF_MEASUREMENT)
 
     history_math = HistoryMath(hass, entity_id, start, end, duration, sensor_type)
     coordinator = HistoryMathUpdateCoordinator(hass, history_math, name)
@@ -97,7 +100,16 @@ async def async_setup_platform(
     if not coordinator.last_update_success:
         raise PlatformNotReady from coordinator.last_exception
     async_add_entities(
-        [HistoryMathSensor(hass, coordinator, name, unique_id, entity_id)]
+        [
+            HistoryMathSensor(
+                hass,
+                coordinator,
+                name,
+                unique_id,
+                unit_of_measurement,
+                entity_id,
+            )
+        ]
     )
 
 
@@ -109,8 +121,18 @@ async def async_setup_entry(
     """Set up the History stats sensor entry."""
     coordinator = entry.runtime_data
     entity_id: str = entry.options[CONF_ENTITY_ID]
+    unit_of_measurement: str | None = entry.options.get(CONF_UNIT_OF_MEASUREMENT)
     async_add_entities(
-        [HistoryMathSensor(hass, coordinator, entry.title, entry.entry_id, entity_id)]
+        [
+            HistoryMathSensor(
+                hass,
+                coordinator,
+                entry.title,
+                entry.entry_id,
+                unit_of_measurement,
+                entity_id,
+            )
+        ]
     )
 
 
@@ -157,13 +179,18 @@ class HistoryMathSensor(HistoryMathSensorBase):
         coordinator: HistoryMathUpdateCoordinator,
         name: str,
         unique_id: str | None,
+        unit_of_measurement: str | None,
         source_entity_id: str,
     ) -> None:
         """Initialize the HistoryMath sensor."""
         super().__init__(coordinator, name)
-        self._attr_native_unit_of_measurement = get_unit_of_measurement(
-            hass,
-            source_entity_id,
+        self._attr_native_unit_of_measurement = (
+            unit_of_measurement
+            if unit_of_measurement is not None
+            else get_unit_of_measurement(
+                hass,
+                source_entity_id,
+            )
         )
         self._attr_unique_id = unique_id
         self._attr_device_info = async_device_info_to_link_from_entity(
