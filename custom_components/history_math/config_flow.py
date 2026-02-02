@@ -57,7 +57,6 @@ DATA_SCHEMA_SETUP = vol.Schema(
     {
         vol.Required(CONF_NAME, default=DEFAULT_NAME): TextSelector(),
         vol.Required(CONF_ENTITY_ID): EntitySelector(),
-        vol.Required(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
         vol.Required(CONF_TYPE, default=CONF_TYPE_MAX): SelectSelector(
             SelectSelectorConfig(
                 options=CONF_TYPE_KEYS,
@@ -74,13 +73,13 @@ DATA_SCHEMA_OPTIONS = vol.Schema(
         vol.Optional(CONF_DURATION): DurationSelector(
             DurationSelectorConfig(enable_day=True, allow_negative=False)
         ),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
     }
 )
 
 DATA_SCHEMA_OPTIONS_STANDALONE = vol.Schema(
     {
         vol.Required(CONF_ENTITY_ID): EntitySelector(),
-        vol.Required(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
         vol.Required(CONF_TYPE, default=CONF_TYPE_MAX): SelectSelector(
             SelectSelectorConfig(
                 options=CONF_TYPE_KEYS,
@@ -93,6 +92,7 @@ DATA_SCHEMA_OPTIONS_STANDALONE = vol.Schema(
         vol.Optional(CONF_DURATION): DurationSelector(
             DurationSelectorConfig(enable_day=True, allow_negative=False)
         ),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
     }
 )
 
