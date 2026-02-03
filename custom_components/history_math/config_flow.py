@@ -6,7 +6,12 @@ from collections.abc import Mapping
 from typing import Any, cast
 
 import voluptuous as vol
-from homeassistant.const import CONF_ENTITY_ID, CONF_NAME, CONF_TYPE
+from homeassistant.const import (
+    CONF_ENTITY_ID,
+    CONF_NAME,
+    CONF_TYPE,
+    CONF_UNIT_OF_MEASUREMENT,
+)
 from homeassistant.helpers.schema_config_entry_flow import (
     SchemaCommonFlowHandler,
     SchemaConfigFlowHandler,
@@ -68,6 +73,26 @@ DATA_SCHEMA_OPTIONS = vol.Schema(
         vol.Optional(CONF_DURATION): DurationSelector(
             DurationSelectorConfig(enable_day=True, allow_negative=False)
         ),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
+    }
+)
+
+DATA_SCHEMA_OPTIONS_STANDALONE = vol.Schema(
+    {
+        vol.Required(CONF_ENTITY_ID): EntitySelector(),
+        vol.Required(CONF_TYPE, default=CONF_TYPE_MAX): SelectSelector(
+            SelectSelectorConfig(
+                options=CONF_TYPE_KEYS,
+                mode=SelectSelectorMode.DROPDOWN,
+                translation_key=CONF_TYPE,
+            )
+        ),
+        vol.Optional(CONF_START): TemplateSelector(),
+        vol.Optional(CONF_END): TemplateSelector(),
+        vol.Optional(CONF_DURATION): DurationSelector(
+            DurationSelectorConfig(enable_day=True, allow_negative=False)
+        ),
+        vol.Optional(CONF_UNIT_OF_MEASUREMENT): TextSelector(),
     }
 )
 
@@ -83,7 +108,7 @@ CONFIG_FLOW = {
 }
 OPTIONS_FLOW = {
     "init": SchemaFlowFormStep(
-        DATA_SCHEMA_OPTIONS,
+        DATA_SCHEMA_OPTIONS_STANDALONE,
         validate_user_input=validate_options,
     ),
 }
