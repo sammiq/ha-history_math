@@ -24,7 +24,8 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers.device import async_entity_id_to_device
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.device import async_entity_id_to_device_id
 from homeassistant.helpers.entity import get_unit_of_measurement
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.reload import async_setup_reload_service
@@ -193,7 +194,10 @@ class HistoryMathSensor(HistoryMathSensorBase):
             )
         )
         self._attr_unique_id = unique_id
-        self.device_entry = async_entity_id_to_device(hass, source_entity_id)
+        # this is async_entity_id_to_device in new versions
+        device_id = async_entity_id_to_device_id(hass, source_entity_id)
+        self.device_entry = dr.async_get(hass).async_get(device_id)
+
         self._process_update()
 
     @callback
