@@ -7,9 +7,6 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ENTITY_ID, CONF_TYPE
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device import (
-    async_remove_stale_devices_links_keep_entity_device,
-)
 from homeassistant.helpers.template import Template
 
 from .const import CONF_DURATION, CONF_END, CONF_START, CONF_TYPE_MAX, PLATFORMS
@@ -38,12 +35,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: HistoryMathConfigEntry) 
     coordinator = HistoryMathUpdateCoordinator(hass, history_math, entry.title)
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
-
-    async_remove_stale_devices_links_keep_entity_device(
-        hass,
-        entry.entry_id,
-        entry.options[CONF_ENTITY_ID],
-    )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(update_listener))
